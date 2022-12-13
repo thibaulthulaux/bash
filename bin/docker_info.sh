@@ -1,0 +1,1 @@
+/home/thibault/Workspaces/bash/scripts/docker/docker_info.sh

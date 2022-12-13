@@ -1,0 +1,35 @@
+#!/usr/bin/env sh
+
+# tmux-session - a tool to set up tmux sessions
+#
+# Somewhat stolen from https://github.com/xuxiaodong/tmuxen  We're going to set
+# up session configurations in `~/.tmux/sessions`.  Add tmux-session to
+# someplace in your ${PATH}.  Run `tmux-session <session_filename>` and it will
+# load the configuration and start up a session.
+
+if [[ $# -lt 1 ]]; then
+  echo "Please specify a session to load."
+  exit 1
+else
+  session=$1
+fi
+
+tmux=$(which tmux)
+
+# Check if there's already a session running
+$tmux has-session -t $session 2> /dev/null
+
+# tmux has-session returns 0 if the session exists
+if [[ $? != 0 ]]; then
+  # start tmux quietly and create a new session named the session and run the
+  # commands in the given session file. The new session automatically starts
+  # up a new window.  Running ` exit` closes that window immediately.
+  $tmux -q new-session -A -d -s $session ' exit' \; \
+    source-file ~/.tmux.conf \; \
+    source-file ~/.tmux/sessions/$session.session
+fi
+
+# attach to the session
+$tmux attach-session -t $session
+
+exit 0
